@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	path = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/segmented/angio_wt/'
 	savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredVoldDat1/angio_wt/'
 
-	filterSize = 40
+	filterSize = 80
 
 
 	filterAndSave_batch('flowSkel',path,savepath,filterSize)
