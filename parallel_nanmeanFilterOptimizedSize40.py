@@ -32,18 +32,25 @@ def streaming3Dfilter(data,outdata,fsize):
 				if datsel.size == 0:
 					outdata[i,j,k] = np.nan
 				else:
-					outdata[i,j,k] = np.mean(x)
-		print('writing slice ' + str(i) + 'to '+ outdata.filename)	
+					outdata[i,j,k] = np.mean(datsel)
+		print('writing slice ' + str(i) + 'to '+ outdata.filename)
+		print('progress: ' + str(i/float(amax[0])*100) + ' percent done')	
 		outdata.flush() #write to disk
 
 
 
-def importStack(path,fname):
+def importStack(path,fname,tmpStackDir):
 	absname = path +fname
 	zsize = vigra.impex.numberImages(absname)
 	im =vigra.readImage(absname, index = 0, dtype='FLOAT')
 	#vol = np.zeros([im.height,im.width,zsize])
-	vol = np.memmap('tmpVolDat/' + fname[0:-4],dtype='float64',mode = 'w+', shape = (im.height,im.width,zsize))
+	
+	try:
+		os.makedirs(tmpStackDir)
+	except:
+		print(tmpStackDir+' already exists')
+
+	vol = np.memmap(tmpStackDir + fname[0:-4],dtype='float64',mode = 'w+', shape = (im.height,im.width,zsize))
 	#raise('hallo')
 	for i in range(zsize):
 		print("importing slice " + str(i) + ' of file '+fname)
@@ -52,25 +59,25 @@ def importStack(path,fname):
 	vol.flush()
 	return vol
 
-def filterAndSave(fname,path,savepath,filterSize):
-	vol = importStack(path,fname)
+def filterAndSave(fname,path,savepath,filterSize,volpath):
+	vol = importStack(path,fname,volpath)
 	
 	try:
-		os.makdirs(savepath)
+		os.makedirs(savepath)
 	except:
 		print(savepath+' already exists')
 	res = np.memmap(savepath + 'filtered_Size_'+ str(filterSize) + fname,dtype = 'float64', mode = 'w+', shape = vol.shape)	
 	streaming3Dfilter(vol, res,filterSize)
 	
 
-def filterAndSave_batch(pattern,path,savepath,filterSize):
+def filterAndSave_batch(pattern,path,savepath,filterSize,volpath):
 	fnames = io.getFilelistFromDir(path,pattern) #list of tiff stacks to be filtered
 	for i in range(len(fnames)):
 	#for i in range(1):
 		print('start filter process for '+fnames[i])
 		mp.Process(target = filterAndSave, args = (fnames[i],path,savepath,filterSize)).start() #parallel processing
 
-def filterAndSave_batch_serial(pattern,path,savepath,filterSize):
+def filterAndSave_batch_serial(pattern,path,savepath,filterSize,volpath):
 	fnames = io.getFilelistFromDir(path,pattern) #list of tiff stacks to be filtered
 	for i in range(len(fnames)):
 	#for i in range(1):
@@ -81,14 +88,15 @@ def filterAndSave_batch_serial(pattern,path,savepath,filterSize):
 
 if __name__ == '__main__':
 
-	path = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/segmented/angio_wt/'
-	savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredVoldDat1/angio_wt/'
+	path = '~/raman_bloodvessel_dat/raw_data/segmented/angio_wt/'
+	savepath = '~/raman_bloodvessel_dat/filteredVoldDat1/angio_wt/'
+	volpath = '~/raman_bloodvessel_dat/rawVoldat1/angio_wt/'
 
 	filterSize = 40
 
 
-	filterAndSave_batch('flowSkel',path,savepath,filterSize)
-	filterAndSave_batch('distanceSkel',path,savepath,filterSize)
+	filterAndSave_batch('flowSkel',path,savepath,filterSize,volpath)
+	filterAndSave_batch('distanceSkel',path,savepath,filterSize,volpath)
 	#filterAndSave_batch_serial('flowSkel',path,savepath,filterSize)
 	#filterAndSave_batch('distanceSkel',path,savepath,filterSize)
 

@@ -12,7 +12,12 @@ import pickle
 import os
 import multiprocessing as mp
 
-def streaming3Dfilter(data,outdata,fsize):
+
+def gaussWeight(dat,sigma,mu):
+	return 1./np.sqrt(2*np.pi*np.square(sigma))*np.exp(-np.square(data-mu)/(2*np.square(sigma)))
+
+def streaming3Dfilter(data,outdata,sigma):
+	fsize = int(np.round(sigma*3)) # filter size
 	amax=np.array(data.shape)-1 #max index
 	amin=amax-amax #min index
 
@@ -28,12 +33,14 @@ def streaming3Dfilter(data,outdata,fsize):
 				
 				dist = np.sqrt(np.square(i-x) + np.square(j-y) + np.square(k-z)) 
 				ind = dist<= fsize 
+				weight = gaussWeight(dist[ind],sigma,0)
 				datsel = datxyz[ind]
 				if datsel.size == 0:
 					outdata[i,j,k] = np.nan
 				else:
-					outdata[i,j,k] = np.mean(datsel)
+					outdata[i,j,k] = np.average(datsel,weights = weight)
 		print('writing slice ' + str(i) + 'to '+ outdata.filename)	
+		print('progress: ' + str(i/float(amax[0])*100) + ' percent done')
 		outdata.flush() #write to disk
 
 
@@ -43,20 +50,14 @@ def importStack(path,fname):
 	zsize = vigra.impex.numberImages(absname)
 	im =vigra.readImage(absname, index = 0, dtype='FLOAT')
 	#vol = np.zeros([im.height,im.width,zsize])
-	vol = np.memmap('tmpVolDat/' + fname[0:-4],dtype='float64',mode = 'w+', shape = (im.height,im.width,zsize))
-	#raise('hallo')
-	for i in range(zsize):
-		print("importing slice " + str(i) + ' of file '+fname)
-		im=np.squeeze(vigra.readImage(absname, index = i, dtype='FLOAT'))
-		vol[:,:,i] = im
-	vol.flush()
+	vol = np.memmap('tmpVolDat/' + fname[0:-4],dtype='float64',mode = 'r', shape = (im.height,im.width,zsize))
 	return vol
 
 def filterAndSave(fname,path,savepath,filterSize):
 	vol = importStack(path,fname)
 	
 	try:
-		os.makdirs(savepath)
+		os.makedirs(savepath)
 	except:
 		print(savepath+' already exists')
 	res = np.memmap(savepath + 'filtered_Size_'+ str(filterSize) + fname,dtype = 'float64', mode = 'w+', shape = vol.shape)	
@@ -82,9 +83,9 @@ def filterAndSave_batch_serial(pattern,path,savepath,filterSize):
 if __name__ == '__main__':
 
 	path = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/segmented/angio_wt/'
-	savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredVoldDat1/angio_wt/'
+	savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredVoldDat_Gauss/angio_wt/'
 
-	filterSize = 80
+	filterSize = 20
 
 
 	filterAndSave_batch('flowSkel',path,savepath,filterSize)
