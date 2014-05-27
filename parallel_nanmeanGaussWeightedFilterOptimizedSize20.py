@@ -14,7 +14,7 @@ import multiprocessing as mp
 
 
 def gaussWeight(dat,sigma,mu):
-	return 1./np.sqrt(2*np.pi*np.square(sigma))*np.exp(-np.square(data-mu)/(2*np.square(sigma)))
+	return 1./np.sqrt(2*np.pi*np.square(sigma))*np.exp(-np.square(dat-mu)/(2*np.square(sigma)))
 
 def streaming3Dfilter(data,outdata,sigma):
 	fsize = int(np.round(sigma*3)) # filter size
@@ -45,16 +45,28 @@ def streaming3Dfilter(data,outdata,sigma):
 
 
 
-def importStack(path,fname):
+def importStack(path,fname,tmpStackDir):
 	absname = path +fname
 	zsize = vigra.impex.numberImages(absname)
 	im =vigra.readImage(absname, index = 0, dtype='FLOAT')
 	#vol = np.zeros([im.height,im.width,zsize])
-	vol = np.memmap('tmpVolDat/' + fname[0:-4],dtype='float64',mode = 'r', shape = (im.height,im.width,zsize))
+	
+	try:
+		os.makedirs(tmpStackDir)
+	except:
+		print(tmpStackDir+' already exists')
+
+	vol = np.memmap(tmpStackDir + fname[0:-4],dtype='float64',mode = 'w+', shape = (im.height,im.width,zsize))
+	#raise('hallo')
+	for i in range(zsize):
+		print("importing slice " + str(i) + ' of file '+fname)
+		im=np.squeeze(vigra.readImage(absname, index = i, dtype='FLOAT'))
+		vol[:,:,i] = im
+	vol.flush()
 	return vol
 
-def filterAndSave(fname,path,savepath,filterSize):
-	vol = importStack(path,fname)
+def filterAndSave(fname,path,savepath,filterSize,volpath):
+	vol = importStack(path,fname,volpath)
 	
 	try:
 		os.makedirs(savepath)
@@ -64,35 +76,35 @@ def filterAndSave(fname,path,savepath,filterSize):
 	streaming3Dfilter(vol, res,filterSize)
 	
 
-def filterAndSave_batch(pattern,path,savepath,filterSize):
+def filterAndSave_batch(pattern,path,savepath,filterSize,volpath):
 	fnames = io.getFilelistFromDir(path,pattern) #list of tiff stacks to be filtered
 	for i in range(len(fnames)):
 	#for i in range(1):
 		print('start filter process for '+fnames[i])
-		mp.Process(target = filterAndSave, args = (fnames[i],path,savepath,filterSize)).start() #parallel processing
+		mp.Process(target = filterAndSave, args = (fnames[i],path,savepath,filterSize,volpath)).start() #parallel processing
 
-def filterAndSave_batch_serial(pattern,path,savepath,filterSize):
+def filterAndSave_batch_serial(pattern,path,savepath,filterSize,volpath):
 	fnames = io.getFilelistFromDir(path,pattern) #list of tiff stacks to be filtered
 	for i in range(len(fnames)):
 	#for i in range(1):
 		print('start filter process for '+fnames[i])
-		filterAndSave(fnames[i],path,savepath,filterSize) #parallel processing
+		filterAndSave(fnames[i],path,savepath,filterSize,volpath) #parallel processing
 
 
 
 if __name__ == '__main__':
 
-	path = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/segmented/angio_wt/'
-	savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredVoldDat_Gauss/angio_wt/'
+	path = '/home/moehlc/raman_bloodvessel_dat/segmented/angio_wt/'
+	savepath = '/home/moehlc/raman_bloodvessel_dat/filteredVoldDatGauss1/angio_wt/'
+	volpath = '/home/moehlc/raman_bloodvessel_dat/rawVoldat2/angio_wt/'
 
 	filterSize = 20
 
 
-	filterAndSave_batch('flowSkel',path,savepath,filterSize)
-	filterAndSave_batch('distanceSkel',path,savepath,filterSize)
+	filterAndSave_batch('flowSkel',path,savepath,filterSize,volpath)
+	filterAndSave_batch('distanceSkel',path,savepath,filterSize,volpath)
 	#filterAndSave_batch_serial('flowSkel',path,savepath,filterSize)
 	#filterAndSave_batch('distanceSkel',path,savepath,filterSize)
-
 
 
 

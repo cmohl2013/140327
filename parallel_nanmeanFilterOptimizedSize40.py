@@ -75,22 +75,22 @@ def filterAndSave_batch(pattern,path,savepath,filterSize,volpath):
 	for i in range(len(fnames)):
 	#for i in range(1):
 		print('start filter process for '+fnames[i])
-		mp.Process(target = filterAndSave, args = (fnames[i],path,savepath,filterSize)).start() #parallel processing
+		mp.Process(target = filterAndSave, args = (fnames[i],path,savepath,filterSize,volpath)).start() #parallel processing
 
 def filterAndSave_batch_serial(pattern,path,savepath,filterSize,volpath):
 	fnames = io.getFilelistFromDir(path,pattern) #list of tiff stacks to be filtered
 	for i in range(len(fnames)):
 	#for i in range(1):
 		print('start filter process for '+fnames[i])
-		filterAndSave(fnames[i],path,savepath,filterSize) #parallel processing
+		filterAndSave(fnames[i],path,savepath,filterSize,volpath) #parallel processing
 
 
 
 if __name__ == '__main__':
 
-	path = '~/raman_bloodvessel_dat/raw_data/segmented/angio_wt/'
-	savepath = '~/raman_bloodvessel_dat/filteredVoldDat1/angio_wt/'
-	volpath = '~/raman_bloodvessel_dat/rawVoldat1/angio_wt/'
+	path = '/home/moehlc/raman_bloodvessel_dat/segmented/angio_wt/'
+	savepath = '/home/moehlc/raman_bloodvessel_dat/filteredVoldDat1/angio_wt/'
+	volpath = '/home/moehlc/raman_bloodvessel_dat/rawVoldat2/angio_wt/'
 
 	filterSize = 40
 
