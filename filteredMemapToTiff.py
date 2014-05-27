@@ -6,14 +6,35 @@ sys.path.append("/mnt/moehlc/home/idaf_library")
 import libidaf.idafIO as io
 import matplotlib.pyplot as plt
 import re
-
-
+import vigra
+import os
 
 #SAVE MEMAPS AS 32bit tiff stacks
 
 #input dirs, locally on animate-x3
 path_filtered40 =      '/home/moehlc/raman_bloodvessel_dat/filteredVoldDat1/angio_wt/'
 path_gaussfiltered20 = '/home/moehlc/raman_bloodvessel_dat/filteredVoldDatGauss1/angio_wt/'
+
+savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filteredTiffs/'
+
+
+
+def exportTiffStack(vol,savepath, fname):
+	
+	if fname.find('.') != -1: #if file extension zB .tif present
+		fnameTrunc = fname[0:fname.find('.')]
+	else:
+		fnameTrunc = fname		
+
+	path = savepath + fnameTrunc + '/'	
+
+	try:
+		os.makedirs(savepath)
+	except:
+		print(savepath+' already exists')
+
+
+	vigra.impex.writeVolume(vol,fname + '.tif','GIF',dtype = 'FLOAT')	
 
 #filename patterns
 pattern = 'filtered_Size_40'
@@ -34,19 +55,12 @@ print(fname)
 print(fname2)
 
 vol_f = np.array(np.memmap(path_filtered40 + fname,dtype = 'float64', mode = 'r', shape = shape))
-#vol_gauss = np.array(np.memmap(path3 + fname,dtype = 'float64', mode = 'r', shape = shape))
-vol_f2 = np.array(np.memmap(path_gaussfiltered20 + fname2,dtype = 'float64', mode = 'r', shape = shape))
 
-im_f = np.nanmean(vol_f,axis = 2)
-im_f2 = np.nanmean(vol_f2,axis = 2)
+exportTiffStack(vol_f,savepath,fname)
 
+#vol_f2 = np.array(np.memmap(path_gaussfiltered20 + fname2,dtype = 'float64', mode = 'r', shape = shape))
 
-plt.close()
+#vigra.impex.writeImage(vol_f,savepath+fname,dtype = 'FLOAT',mode = 'w')
 
 
-fig = plt.figure()
-fig.add_subplot(1,2,1)
-plt.imshow(im_f)
-fig.add_subplot(1,2,2)
-plt.imshow(im_f2)
-plt.show()
+
