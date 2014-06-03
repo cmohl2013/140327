@@ -12,7 +12,12 @@ import pickle
 import os
 import multiprocessing as mp
 
-def streaming3Dfilter(data,outdata,fsize):
+
+def gaussWeight(dat,sigma,mu):
+	return 1./np.sqrt(2*np.pi*np.square(sigma))*np.exp(-np.square(dat-mu)/(2*np.square(sigma)))
+
+def streaming3Dfilter(data,outdata,sigma):
+	fsize = int(np.round(sigma*3)) # filter size
 	amax=np.array(data.shape)-1 #max index
 	amin=amax-amax #min index
 
@@ -28,13 +33,14 @@ def streaming3Dfilter(data,outdata,fsize):
 				
 				dist = np.sqrt(np.square(i-x) + np.square(j-y) + np.square(k-z)) 
 				ind = dist<= fsize 
+				weight = gaussWeight(dist[ind],sigma,0)
 				datsel = datxyz[ind]
 				if datsel.size == 0:
 					outdata[i,j,k] = np.nan
 				else:
-					outdata[i,j,k] = np.mean(datsel)
-		print('writing slice ' + str(i) + 'to '+ outdata.filename)
-		print('progress: ' + str(i/float(amax[0])*100) + ' percent done')	
+					outdata[i,j,k] = np.average(datsel,weights = weight)
+		print('writing slice ' + str(i) + 'to '+ outdata.filename)	
+		print('progress: ' + str(i/float(amax[0])*100) + ' percent done')
 		outdata.flush() #write to disk
 
 
@@ -87,19 +93,19 @@ def filterAndSave_batch_serial(pattern,path,savepath,filterSize,volpath):
 
 
 if __name__ == '__main__':
-
-	path = '/home/moehlc/raman_bloodvessel_dat/segmented/angio_ad/'
+	
+	path = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/segmented/angio_ad/'
 	savepath = '/home/moehlc/raman_bloodvessel_dat/filteredVoldDat1/angio_ad/'
 	volpath = '/home/moehlc/raman_bloodvessel_dat/rawVoldat2/angio_ad/'
 
-	filterSize = 40
+
+	filterSize = 20
 
 
 	filterAndSave_batch('flowSkel',path,savepath,filterSize,volpath)
 	filterAndSave_batch('distanceSkel',path,savepath,filterSize,volpath)
 	#filterAndSave_batch_serial('flowSkel',path,savepath,filterSize)
 	#filterAndSave_batch('distanceSkel',path,savepath,filterSize)
-
 
 
 
