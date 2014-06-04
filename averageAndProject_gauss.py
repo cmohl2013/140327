@@ -49,6 +49,7 @@ def loadAverageSave(path,pattern,shape,savepath,savename):
 	exportPickle(nn,savepath,'volNN_' + savename)
 
 def loadAverageSave_parallel(path,pattern,shape,savepath,savename):
+	print('start process for '+savename)
 	mp.Process(target = loadAverageSave, args = (path,pattern,shape,savepath,savename)).start() #parallel processing	
 
 
@@ -79,8 +80,8 @@ savename2_10_ad = 'flow_Size_10_angioAD'
 
 shape = (320,320,272) 
 
-loadAverageSave_parallel(path_ad,pattern1_20,savepath,savename1_20_ad)
-loadAverageSave_parallel(path_ad,pattern2_20,savepath,savename2_20_ad)
+loadAverageSave_parallel(path_ad,pattern1_20,shape,savepath,savename1_20_ad)
+loadAverageSave_parallel(path_ad,pattern2_20,shape,savepath,savename2_20_ad)
 #loadAverageSave_parallel(path_ad,pattern1_10,savepath,savename1_10_ad)
 #loadAverageSave_parallel(path_ad,pattern2_10,savepath,savename2_10_ad)
 
