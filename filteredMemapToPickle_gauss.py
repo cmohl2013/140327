@@ -58,9 +58,9 @@ pattern2 = 'filtered_Size_20'
 shape = (320,320,272)
 
 expPickles(path_ad,savepath_ad,pattern1,shape) #save meanfiltered data
-expPickles(path_wt,savepath_wt,pattern2,shape) #save meanfiltered data
-expPickles(path_ad,savepath_ad,pattern2,shape) #save meanfiltered data
-expPickles(path_wt,savepath_wt,pattern1,shape) #save meanfiltered data
+#expPickles(path_wt,savepath_wt,pattern2,shape) #save meanfiltered data
+#expPickles(path_ad,savepath_ad,pattern2,shape) #save meanfiltered data
+#expPickles(path_wt,savepath_wt,pattern1,shape) #save meanfiltered data
 
 
 

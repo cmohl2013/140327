@@ -82,13 +82,13 @@ shape = (320,320,272)
 
 loadAverageSave_parallel(path_ad,pattern1_20,shape,savepath,savename1_20_ad)
 loadAverageSave_parallel(path_ad,pattern2_20,shape,savepath,savename2_20_ad)
-#loadAverageSave_parallel(path_ad,pattern1_10,savepath,savename1_10_ad)
-#loadAverageSave_parallel(path_ad,pattern2_10,savepath,savename2_10_ad)
+loadAverageSave_parallel(path_ad,pattern1_10,shape,savepath,savename1_10_ad)
+loadAverageSave_parallel(path_ad,pattern2_10,shape,savepath,savename2_10_ad)
 
 
-#loadAverageSave_parallel(path_wt,pattern1_20,savepath,savename1_20_wt)
-#loadAverageSave_parallel(path_wt,pattern2_20,savepath,savename2_20_wt)
-#loadAverageSave_parallel(path_wt,pattern1_10,savepath,savename1_10_wt)
-#loadAverageSave_parallel(path_wt,pattern2_10,savepath,savename2_10_wt)
+loadAverageSave_parallel(path_wt,pattern1_20,shape,savepath,savename1_20_wt)
+loadAverageSave_parallel(path_wt,pattern2_20,shape,savepath,savename2_20_wt)
+loadAverageSave_parallel(path_wt,pattern1_10,shape,savepath,savename1_10_wt)
+loadAverageSave_parallel(path_wt,pattern2_10,shape,savepath,savename2_10_wt)
 
 
