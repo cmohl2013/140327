@@ -54,13 +54,9 @@ vol_flow_20_wt = importAndFlatten(path,'flow_Size_20_angioWT.pickle')
 
 
 
-low = 1
-high = 1.9
-
-
 
 plt.close()
 fig1 = plotGrid(vol_dist_10_ad,vol_dist_20_ad,vol_dist_10_wt,vol_dist_20_wt,1,1.9)
-fig2 = plotGrid(vol_flow_10_ad,vol_flow_20_ad,vol_flow_10_wt,vol_flow_20_wt,0,256)
+fig2 = plotGrid(vol_flow_10_ad,vol_flow_20_ad,vol_flow_10_wt,vol_flow_20_wt,39,100)
 
 plt.show()
