@@ -60,9 +60,9 @@ path_wt = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/filt
 
 
 pattern1_20 = 'filtered_Size_20distanceSkel' # gaussfiltered distance images
-pattern2_20 = 'filtered_Size_20distanceSkel'
+pattern2_20 = 'filtered_Size_20flowSkel'
 pattern1_10 = 'filtered_Size_10distanceSkel' # gaussfiltered distance images
-pattern2_10 = 'filtered_Size_10distanceSkel'
+pattern2_10 = 'filtered_Size_10dflowSkel'
 
 savepath = '/mnt/moehlc/idaf/IDAF_Projects/140327_raman_bloodvessel_mri/data/averagedPickles/'
 
